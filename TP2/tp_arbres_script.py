@@ -6,7 +6,7 @@ import seaborn as sns
 from matplotlib import rc
 
 from sklearn import tree, datasets
-from TP2.tp_arbres_source import (rand_gauss, rand_bi_gauss, rand_tri_gauss,
+from tp_arbres_source import (rand_gauss, rand_bi_gauss, rand_tri_gauss,
                               rand_checkers, rand_clown,
                               plot_2d, frontiere)
 
@@ -103,16 +103,16 @@ plot_2d(data4[:, :2], data4[:, 2], w=None)
 # classification comme l'indice de gini ou l'entropie, avec la
 # fonction 'DecisionTreeClassifier' du module 'tree'.
 
-# dt_entropy = TODO
-# dt_gini = TODO
+dt_entropy = tree.DecisionTreeClassifier(criterion='entropy')
+dt_gini = tree.DecisionTreeClassifier(criterion='gini')
 
 # Effectuer la classification d'un jeu de données simulées avec rand_checkers des échantillons de
 # taille n = 456 (attention à bien équilibrer les classes)
 
-# data = TODO
+data = rand_checkers(n1=114,n2=114,n3=114,n4=114,sigma=0.1)
 n_samples = len(data)
-# X = TODO
-# Y = TODO and careful with the type (cast to int)
+X = data[:,:2]
+Y = data[:,2].astype(int)
 
 dt_gini.fit(X, Y)
 dt_entropy.fit(X, Y)
@@ -134,13 +134,13 @@ scores_gini = np.zeros(dmax)
 
 plt.figure(figsize=(15, 10))
 for i in range(dmax):
-    # dt_entropy = ... TODO
-    # ...
-    # scores_entropy[i] = dt_entropy.score(X, Y)
+    dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',max_depth=i+1)
+    dt_entropy.fit(X,Y)
+    scores_entropy[i] = dt_entropy.score(X, Y)
 
-    # dt_gini = ... TODO
-    # ...
-    # scores_gini[i] = TODO
+    dt_gini = tree.DecisionTreeClassifier(criterion='gini',max_depth=i+1)
+    dt_gini.fit(X,Y)
+    scores_gini[i] = dt_gini.score(X, Y)
 
     plt.subplot(3, 4, i + 1)
     frontiere(lambda x: dt_gini.predict(x.reshape((1, -1))), X, Y, step=50, samples=False)
@@ -148,7 +148,7 @@ plt.draw()
 
 
 plt.figure()
-# plt.plot(...)  # TODO
+plt.plot(dmax,scores_gini)  
 plt.xlabel('Max depth')
 plt.ylabel('Accuracy Score')
 plt.draw()
